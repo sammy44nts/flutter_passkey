@@ -2,14 +2,14 @@ group 'com.authentrend.flutter_passkey'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.7.10'
+    ext.kotlin_version = '1.9.23'
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.0'
+        classpath 'com.android.tools.build:gradle:7.4.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -41,15 +41,15 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 28
     }
 }
 
 dependencies {
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1"
-    implementation "androidx.credentials:credentials:1.2.0-rc01"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0"
+    implementation "androidx.credentials:credentials:1.2.2"
 
     // optional - needed for credentials support from play services, for devices running
     // Android 13 and below.
-    implementation "androidx.credentials:credentials-play-services-auth:1.2.0-rc01"
+    implementation "androidx.credentials:credentials-play-services-auth:1.2.2"
 }

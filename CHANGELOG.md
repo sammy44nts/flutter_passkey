@@ -1,3 +1,8 @@
+## 1.0.5
+
+* Upgrade androidx.credentials version to 1.2.2
+* Add PlatformPublicKeyCredentialRegistrationRequest for cross-platform authenticatorAttachment
+
 ## 1.0.4
 
 * Upgrade androidx.credentials version to 1.2.0-rc01

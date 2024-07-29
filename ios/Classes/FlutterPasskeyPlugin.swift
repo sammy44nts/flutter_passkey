@@ -269,6 +269,7 @@ public class FlutterPasskeyPlugin: NSObject, FlutterPlugin {
         case .platform:
             authorizationRequests.append(try createPlatformPublicKeyCredentialRegistrationRequest(options))
         case .crossPlatform:
+            authorizationRequests.append(try createPlatformPublicKeyCredentialRegistrationRequest(options))
             authorizationRequests.append(try createSecurityKeyPublicKeyCredentialRegistrationRequest(options))
         default:
             authorizationRequests.append(try createPlatformPublicKeyCredentialRegistrationRequest(options))
@@ -281,23 +282,16 @@ public class FlutterPasskeyPlugin: NSObject, FlutterPlugin {
     
     private func requestCredentialAssertion(_ options: PublicKeyCredentialRequestOptions) throws -> String {
         var authorizationRequests: [ASAuthorizationRequest] = []
-        switch options.authenticatorAttachment {
-        case .platform:
-            authorizationRequests.append(try createPlatformPublicKeyCredentialAssertionRequest(options))
-        case .crossPlatform:
+        authorizationRequests.append(try createPlatformPublicKeyCredentialAssertionRequest(options))
+        /* ISSUE:
+         * iOS(16.4.1) will show QR code for Passkeys if adding both PlatformPublicKeyCredentialAssertionRequest and
+         * SecurityKeyPublicKeyCredentialAssertionRequest into authorizationRequests and allowCredentials is not empty.
+         * It seems that allowCredentials cannot be found in the platform credeintials, but it will work if removing
+         * SecurityKeyPublicKeyCredentialAssertionRequest from authorizationRequests, that means allowCredentials can be found.
+         */
+        // WORKAROUND: Adding SecurityKeyPublicKeyCredentialAssertionRequest if there is no any platform credeintial can be found in allowCredentials. But the saved platform credentials are not all on the device, due to there is no way can get all platform credentials from iOS.
+        if findPlatformCredentials(options.allowCredentials).count == 0 {
             authorizationRequests.append(try createSecurityKeyPublicKeyCredentialAssertionRequest(options))
-        default:
-            authorizationRequests.append(try createPlatformPublicKeyCredentialAssertionRequest(options))
-            /* ISSUE:
-             * iOS(16.4.1) will show QR code for Passkeys if adding both PlatformPublicKeyCredentialAssertionRequest and
-             * SecurityKeyPublicKeyCredentialAssertionRequest into authorizationRequests and allowCredentials is not empty.
-             * It seems that allowCredentials cannot be found in the platform credeintials, but it will work if removing
-             * SecurityKeyPublicKeyCredentialAssertionRequest from authorizationRequests, that means allowCredentials can be found.
-             */
-            // WORKAROUND: Adding SecurityKeyPublicKeyCredentialAssertionRequest if there is no any platform credeintial can be found in allowCredentials. But the saved platform credentials are not all on the device, due to there is no way can get all platform credentials from iOS.
-            if findPlatformCredentials(options.allowCredentials).count == 0 {
-                authorizationRequests.append(try createSecurityKeyPublicKeyCredentialAssertionRequest(options))
-            }
         }
         let credential = try requestCredential(authorizationRequests)
         let response = try generateCredentialResponse(credential)
